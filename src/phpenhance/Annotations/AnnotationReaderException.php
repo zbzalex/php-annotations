@@ -1,5 +1,5 @@
 <?php
 
-namespace Annotations;
+namespace phpenhance\Annotations;
 
 class AnnotationReaderException extends \Exception {}

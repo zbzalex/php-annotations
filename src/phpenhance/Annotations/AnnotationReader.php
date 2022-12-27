@@ -1,8 +1,8 @@
 <?php
 
-namespace Annotations;
+namespace phpenhance\Annotations;
 
-use Util\IteratorImpl;
+use phpenhance\Util\IteratorImpl;
 
 class AnnotationReader
 {

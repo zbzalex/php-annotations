@@ -1,6 +1,6 @@
 <?php
 
-namespace Util;
+namespace phpenhance\Util;
 
 interface IIterator
 {

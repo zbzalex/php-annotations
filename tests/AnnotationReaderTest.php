@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Annotations\AnnotationReader;
+use phpenhance\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 
 class ApplicationTest extends TestCase

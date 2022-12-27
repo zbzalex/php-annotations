@@ -16,6 +16,14 @@ namespace Tests;
  * @MultilineAnnotation(
  * param1 = "hello"
  * )
+ * @ArrayAnnotations([
+ * "hello1",
+ * "hello2",
+ * ])
+ * @ArrayParameterAnnotation(param = [
+ * "hello1",
+ * "hello2",
+ * ])
  */
 class Model
 {
@@ -24,7 +32,7 @@ class Model
 ```
 
 ```
-$annotationReader = new \Annotations\AnnotationReader(\Tests\Model::class);
+$annotationReader = new \phpenhance\Annotations\AnnotationReader(\Tests\Model::class);
 $annotationReader->parse();
 
 $annotations = $annotationReader->getAnnotations();

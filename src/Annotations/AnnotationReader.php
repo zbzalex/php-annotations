@@ -2,11 +2,13 @@
 
 namespace Annotations;
 
+use Util\IteratorImpl;
+
 class AnnotationReader
 {
   private $rawDocBlock;
   private $annotations = [];
-  private $delimiters = "@()=,";
+  private $delimiters = "@()=,[";
   private $blanks = "\x20\n\r\t";
   private $tokens = [];
 
@@ -17,7 +19,6 @@ class AnnotationReader
 
     $reflector = null;
     if ($count == 0) {
-      throw new AnnotationReaderException();
     } else if ($count == 1) {
       $reflector = new \ReflectionClass($arguments[0]);
     } else {
@@ -97,8 +98,13 @@ class AnnotationReader
     do {
       $len = $cursor - $start;
       $value = $cursor == strlen($raw) ? null : substr($raw, $cursor, 1);
-      if ($value == null) break;
 
+      if ($value == null) {
+        if ($len > 0) {
+          $this->pushToken($raw, $start, $len);
+        }
+        break;
+      }
 
       if (($this->isBlank($value) || $this->isDelimiter($value)) && !$insideString) {
         if ($len > 0) {
@@ -169,6 +175,16 @@ class AnnotationReader
         "comma",
         substr($raw, $start, $len)
       ];
+    } else if (substr($raw, $start, 1) == "[") {
+      $this->tokens[] = [
+        "op_brackets",
+        substr($raw, $start, $len)
+      ];
+    } else if (substr($raw, $start, 1) == "]") {
+      $this->tokens[] = [
+        "cl_brackets",
+        substr($raw, $start, $len)
+      ];
     }
   }
 
@@ -213,24 +229,61 @@ class AnnotationReader
 
               $i++;
 
-              if ($this->tokens[$i][0] == "id" && (count($params) == 0 || $comma)) {
+              if ($this->tokens[$i][0] == "op_brackets") {
+                $params["value"] = [];
+
+                do {
+                  $i++;
+
+                  if ($this->tokens[$i][0] == "const_string" && (count($params["value"]) == 0 || $comma)) {
+                    $pval  = $this->tokens[$i][1];
+                    $params["value"][] = $this->unquote($pval);
+                  }
+
+                  if ($this->tokens[$i][0] == "comma") {
+                    $comma = true;
+                    continue;
+                  }
+                } while ($this->tokens[$i][0] != "cl_brackets");
+
+                break;
+              } else if ($this->tokens[$i][0] == "id" && (count($params) == 0 || $comma)) {
 
                 $pname = $this->tokens[$i][1];
                 $i++;
 
-                if ($this->tokens[$i][0] != "assign") {
-                  break;
+                if ($this->tokens[$i][0] == "assign") {
+                  $i++;
+
+                  if ($this->tokens[$i][0] == "op_brackets") {
+                    $comma = false;
+
+                    $params[$pname] = [];
+
+                    do {
+                      $i++;
+
+                      if ($this->tokens[$i][0] == "const_string" && (count($params[$pname]) == 0 || $comma)) {
+                        $pval  = $this->tokens[$i][1];
+                        $params[$pname][] = $this->unquote($pval);
+                      }
+
+                      if ($this->tokens[$i][0] == "comma") {
+                        $comma = true;
+                        continue;
+                      }
+                    } while ($this->tokens[$i][0] != "cl_brackets");
+
+                    $comma = false;
+                  } else if ($this->tokens[$i][0] == "const_string") {
+
+                    $pval  = $this->tokens[$i][1];
+
+                    $params[$pname] = $this->unquote($pval);
+
+                    $comma = false;
+                  }
                 }
-
-                $i++;
-
-                if ($this->tokens[$i][0] !== "const_string") break;
-
-                $pval  = $this->tokens[$i][1];
-
-                $params[$pname] = $this->unquote($pval);
-
-                $comma = false;
               } else if ($this->tokens[$i][0] == "const_string" && count($params) == 0) {
                 $pname = "value";
 
@@ -244,12 +297,12 @@ class AnnotationReader
                 continue;
               }
             } while ($this->tokens[$i][0] !== "cl_parentheses");
-
-            $this->annotations[] = new Annotation(
-              $name,
-              $params
-            );
           }
+
+          $this->annotations[] = new Annotation(
+            $name,
+            $params
+          );
         }
       }
     } while ($i++ < count($this->tokens) - 1);
@@ -266,5 +319,18 @@ class AnnotationReader
   public function getAnnotations()
   {
     return $this->annotations;
+  }
+
+  public function getAnnotation($annotationName)
+  {
+    $it = new IteratorImpl($this->annotations);
+    while ($it->hasNext()) {
+      $annotation = $it->next();
+      if ($annotation->getName() == $annotationName) {
+        return $annotation;
+      }
+    }
+
+    return null;
   }
 }

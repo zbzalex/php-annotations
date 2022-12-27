@@ -2,23 +2,38 @@
 
 namespace Annotations;
 
+use Util\IteratorImpl;
+
 class Annotation
 {
   private $name;
-  private $params;
+  private $parameters;
 
-  public function __construct($name, array $params = [])
+  public function __construct($name, array $parameters = [])
   {
     $this->name = $name;  
-    $this->params = $params;
+    $this->parameters = $parameters;
   }
 
   public function getName() {
     return $this->name;
   }
 
-  public function getParams()
+  public function getParameters()
   {
-    return $this->params;
+    return $this->parameters;
+  }
+
+  public function getParameter($pname)
+  {
+    $it = new IteratorImpl(array_keys($this->parameters));
+    while ($it->hasNext()) {
+      $p = $it->next();
+      if ($p == $pname) {
+        return $this->parameters[$p];
+      }
+    }
+
+    return null;
   }
 }

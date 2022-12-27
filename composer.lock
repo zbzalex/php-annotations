@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c3c0cd4a77ae5dc0a08680dd6024e30d",
+    "content-hash": "38ec32f1c8f819986433e8a730514e8e",
     "packages": [
         {
             "name": "doctrine/instantiator",
@@ -270,6 +270,51 @@
                 "source": "https://github.com/phpDocumentor/TypeResolver/tree/master"
             },
             "time": "2017-07-14T14:27:02+00:00"
+        },
+        {
+            "name": "phpenhance/utils",
+            "version": "dev-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zbzalex/php-utils.git",
+                "reference": "a048be2848e6f836cea560fceff8ef481ac33189"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zbzalex/php-utils/zipball/a048be2848e6f836cea560fceff8ef481ac33189",
+                "reference": "a048be2848e6f836cea560fceff8ef481ac33189",
+                "shasum": ""
+            },
+            "require": {
+                "phpunit/phpunit": "^5.7"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sasha Broslavskiy",
+                    "email": "sasha.broslavskiy@gmail.com"
+                }
+            ],
+            "homepage": "https://web3horizen.com",
+            "keywords": [
+                "annotations",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/zbzalex/php-utils/issues",
+                "source": "https://github.com/zbzalex/php-utils/tree/dev"
+            },
+            "time": "2022-12-27T20:57:28+00:00"
         },
         {
             "name": "phpspec/prophecy",
@@ -1526,8 +1571,10 @@
     ],
     "packages-dev": [],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": [],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "phpenhance/utils": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
